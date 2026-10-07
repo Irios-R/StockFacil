@@ -1,25 +1,27 @@
-public class ProductoService : IProductoService
+using StockFacil.Data;
+using StockFacil.Models;
+
+namespace StockFacil.Services
 {
-    private readonly IProductoRepository _repository;
-
-    public ProductoService(IProductoRepository repository)
+    public class ProductoService
     {
-        _repository = repository;
-    }
+        private readonly ProductoRepository _repository;
 
-    public async Task<Producto> CrearProductoAsync(Producto nuevoProducto)
-    {
-        if (nuevoProducto.Precio <= 0)
+        public ProductoService(ProductoRepository repository)
         {
-            throw new ArgumentException("El precio del producto debe ser mayor a cero.");
+            _repository = repository;
         }
 
-        if (string.IsNullOrWhiteSpace(nuevoProducto.Nombre))
+        public Producto RegistrarProducto(int id, string nombre, decimal precio)
         {
-            throw new ArgumentException("El nombre del producto no puede estar vacío.");
-        }
+            if (string.IsNullOrWhiteSpace(nombre) || precio <= 0)
+            {
+                throw new ArgumentException("El nombre no puede estar vacío y el precio debe ser mayor a 0.");
+            }
 
-        // Si pasa las validaciones, se guarda en la base de datos
-        return await _repository.AddAsync(nuevoProducto);
+            var producto = new Producto { Id = id, Nombre = nombre, Precio = precio };
+            _repository.Agregar(producto);
+            return producto;
+        }
     }
 }
